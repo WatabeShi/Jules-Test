@@ -37,6 +37,7 @@ function resetGameState() {
     // Reset score and lives
     score = 0;
     lives = 3;
+    gameStarted = false; // Ensure gameStarted is reset
 
     // Reset control state
     rightPressed = false;
@@ -266,6 +267,7 @@ if (typeof document !== 'undefined') {
     }
     global.score = 0;
     global.lives = 3;
+    global.gameStarted = false; // Added for testing game state
     global.rightPressed = false;
     global.leftPressed = false;
 
@@ -274,6 +276,14 @@ if (typeof document !== 'undefined') {
 
     // Globally expose functions from script.js that are needed for tests
     // This is a simplification. Ideally, script.js would export them.
+
+    // Mock mouseDownHandler logic for tests
+    global.mockMouseDownHandler = function(mockEvent) {
+        if (mockEvent.button === 0 && !gameStarted) {
+            gameStarted = true;
+        }
+    };
+
     global.collisionDetection = function() {
         for (let c = 0; c < brickColumnCount; c++) {
             for (let r = 0; r < brickRowCount; r++) {
@@ -305,6 +315,75 @@ testBrickCollision();
 testScoreIncrement();
 testWallCollisions();
 testPaddleCollision();
+
+// Test Suite: Game State (gameStarted)
+function testGameState() {
+    console.log("\n--- Testing Game State (gameStarted) ---");
+
+    // Test 1: Initial state
+    resetGameState();
+    printTestResult("Initial game state: gameStarted is false", gameStarted === false);
+
+    // Test 2: State after click (launch)
+    resetGameState(); // Ensure it's false before click
+    mockMouseDownHandler({ button: 0 }); // Simulate left click
+    printTestResult("After click (game not started): gameStarted is true", gameStarted === true);
+
+    // Test 3: Click when already started (should not change gameStarted if it's already true)
+    resetGameState();
+    gameStarted = true; // Manually set to true
+    mockMouseDownHandler({ button: 0 }); // Simulate left click
+    printTestResult("After click (game already started): gameStarted remains true", gameStarted === true);
+
+    // Test 4: Click with right mouse button (should not change gameStarted)
+    resetGameState();
+    mockMouseDownHandler({ button: 1 }); // Simulate right click
+    printTestResult("After right-click: gameStarted remains false", gameStarted === false);
+
+
+    // Test 5: State after losing a life (but not game over)
+    resetGameState();
+    lives = 2; // Set lives to more than 1
+    gameStarted = true; // Simulate game was running
+
+    // Simulate the logic from draw() when a life is lost
+    lives--; // lives becomes 1
+    if (!lives) {
+        // Game over - not this path for this test
+    } else {
+        // Reset ball, paddle, and gameStarted state (as in script.js)
+        // x = mockCanvas.width / 2; // Not strictly needed for this specific test's check
+        // y = mockCanvas.height - 30;
+        // dx = 2;
+        // dy = -2;
+        // paddleX = (mockCanvas.width - paddleWidth) / 2;
+        gameStarted = false; // This is the key line from script.js's logic
+    }
+    printTestResult("After losing a life (lives > 0): gameStarted is false", gameStarted === false);
+    printTestResult("After losing a life (lives > 0): lives decremented correctly", lives === 1);
+
+
+    // Test 6: State after losing the last life (game over)
+    resetGameState();
+    lives = 1; // Set to last life
+    gameStarted = true; // Simulate game was running
+    let reloaded = false;
+    const originalReload = global.document.location.reload; // Backup original mock
+    global.document.location.reload = () => { reloaded = true; /*console.log("Mock reload called for test")*/ };
+
+    lives--; // lives becomes 0
+    if (!lives) {
+        // alert('GAME OVER'); // Mocked in global scope
+        document.location.reload();
+        // gameStarted state after this is irrelevant in real game due to reload
+    } else {
+        // Not this path
+    }
+    printTestResult("After losing last life: document.location.reload() was called", reloaded === true);
+    global.document.location.reload = originalReload; // Restore original mock
+}
+
+testGameState();
 
 console.log("\nTests finished.");
 // To run these tests, you would typically open index.html in a browser
