@@ -1,7 +1,16 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('gameCanvas');
+    if (!canvas) {
+        console.error('Error: Canvas element with ID "gameCanvas" not found.');
+        return;
+    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Error: Failed to get 2D rendering context for canvas.');
+        return;
+    }
 
-// Game variables
+    // Game variables
 let score = 0;
 let lives = 3;
 
@@ -172,6 +181,7 @@ function draw() {
     }
 
     requestAnimationFrame(draw);
-}
+    }
 
-draw();
+    draw();
+});
