@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-    <meta charset="UTF-TF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple TODO App</title>
+    <title>シンプルなTODOアプリ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>My TODO List</h1>
-        <input type="text" id="taskInput" placeholder="Enter a new task...">
-        <button id="addTaskBtn">Add Task</button>
+        <h1>私のTODOリスト</h1>
+        <input type="text" id="taskInput" placeholder="新しいタスクを入力...">
+        <input type="text" id="assigneeInput" placeholder="担当者名...">
+        <button id="addTaskBtn">タスクを追加</button>
         <ul id="taskList">
-            <!-- Tasks will be added here -->
+            <!-- タスクはここに追加されます -->
         </ul>
     </div>
     <script src="script.js"></script>
